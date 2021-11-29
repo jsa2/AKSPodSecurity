@@ -1,11 +1,36 @@
 # Azure Kubernetes Service - Enhanced Kubernetes cluster pod security baseline standards for Linux-based workloads
 
-Builds upon existing Pod Security baseline with enhancements, and provides means to manage the initiative as code using GitHub actions.
+This example builds upon existing Pod Security baseline with enhancements, and provides means to manage the initiative as code using GitHub actions.
 (You can also create manually the initiative, but this guide does not have instructions for manual workflow)
+
+**Scope** of this guide is to increase workload security by aligning the use of Azure Policy and resource specification together. First with audit controls, and then with deny controls.
+
+**Original policy baseline policy** 
+
+Description| source
+-|-
+|This initiative includes the policies for the Kubernetes cluster pod security baseline standards. This policy is generally available for Kubernetes Service (AKS), and preview for AKS Engine and Azure Arc enabled Kubernetes. For instructions on using this policy, visit https://aka.ms/kubepolicydoc.|Kubernetes cluster pod security baseline standards for Linux-based workloads
+
+
+**Enhanced policy**
+
+![img](img/front.png)
+
+- [Azure Kubernetes Service - Enhanced Kubernetes cluster pod security baseline standards for Linux-based workloads](#azure-kubernetes-service---enhanced-kubernetes-cluster-pod-security-baseline-standards-for-linux-based-workloads)
+  - [Differences compared to the built-in initiative:](#differences-compared-to-the-built-in-initiative)
+  - [Utilizing the initiative](#utilizing-the-initiative)
+    - [Example of which policy affects which specification in resource](#example-of-which-policy-affects-which-specification-in-resource)
+    - [Example of healthy podspec](#example-of-healthy-podspec)
+  - [Deployment guide:](#deployment-guide)
+    - [Express installation with password based SPN (recommended only for testing)](#express-installation-with-password-based-spn-recommended-only-for-testing)
+    - [Advanced with Workload federation (recommended for enterprise use)](#advanced-with-workload-federation-recommended-for-enterprise-use)
+  - [References](#references)
+
+
 
 ---
 
-**Differences compared to the built-in initiative:**
+## Differences compared to the built-in initiative:
 
 
 ✔️ Adds "debug" namespace to exclusions, so you don't have to run debugging workloads in the namespaces  ``["kube-system" "gatekeeper-system", "azure-arc"] ``
@@ -24,6 +49,10 @@ kubectl debug node/$val -it --image=mcr.microsoft.com/aks/fundamental/base-ubunt
 - Configuration is compliant with the "runtime/default" out-of-the-box AKS node installed profile. Creates initiative parameter for "runtime/default" appArmor profile, which is the default profile installed in AKS nodes
 
 ✔️ Adds  `` Kubernetes cluster containers should run with a read only root file system `` 
+
+✔️ Allows switching state for allow policies from audit to deny in single setting using Initiative parameters
+
+![img](img/init.png)
 
 ---
 
@@ -167,10 +196,19 @@ with:
 
 ![img](img/assingment.png)
 
+9. Review results and determine which resources need to be fixed, or excluded from policy
+![img](img/compl.png)
+
+![img](img/details.png)
+10. If you feel that everything works correctly, turn the policy initative to deny
+
+![img](img/init.png)
+
 ### Advanced with Workload federation (recommended for enterprise use)
 
-- This is production use example
+- To be tested!
 
+[documentation](https://docs.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication)
 
 ## References
 https://kubernetes.io/docs/concepts/policy/pod-security-policy/
