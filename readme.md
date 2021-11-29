@@ -34,6 +34,31 @@ kubectl debug node/$val -it --image=mcr.microsoft.com/aks/fundamental/base-ubunt
 - Implement healthy podSpec / deployment 
 
 
+### Example of which policy affects which specification in resource 
+
+MS Docs features good example of complete healthy and unhealthy specifications
+
+[Unhealthy specification ](https://docs.microsoft.com/en-us/azure/defender-for-cloud/kubernetes-workload-protections#unhealthy-deployment-example-yaml-file)
+
+[healthy specification ](https://docs.microsoft.com/en-us/azure/defender-for-cloud/kubernetes-workload-protections#healthy-deployment-example-yaml-file)
+
+---
+
+**Mapping to Azure Policy and specification**
+
+The below table highlights healthy, and un-healthy settings examples spec
+
+item|status | YAML 
+-|-|-
+Pods should run as non-root /non-privileged|✔ | **spec.securityContext** <br> ``privileged: false``  <br>       ``runAsNonRoot:true`` <br> ``allowPrivilegeEscalation: false``
+Pod Filesystem access should be read-only or limited only for specifed writes | ✔ | **spec.securityContext** <br> ``readOnlyRootFilesystem: true`` 
+Pod actions should be limited with appArmor |✔| **metadata.annotations** <br> ``container.apparmor.security.beta.kubernetes.io/v5: runtime/default`` 
+Pod should be disabled for automation of API credentials |✔| **spec** <br> `` automountServiceAccountToken: false `` 
+Pod hostPath mounts should only allow predefined mounts, and preferably not used at all (By default Azure Policy audits all hostPath mounts as non compliant, to block hostPath mounts the policy needs to be changed) | ✔ | **spec.Volumes** <br> `` hostPath: <Only allowed values here defined in Azure Policy> `` 
+**MS direct reference** *To protect against privilege escalation outside the container, avoid pod access to sensitive host namespaces (host process ID and host IPC) in a Kubernetes cluster*.   |❌| Should not define use of 'true' in following settings **spec.hostPID** <br> `` hostPID:   `` <br> **spec.hostIPC** <br> ``hostIPC: `` 
+**MS direct reference**  *Pods created with the hostNetwork attribute enabled will share the node’s network space. To avoid compromised container from sniffing network traffic, we recommend not putting your pods on the host network*|❌|  Should not define use of 'true' in following settings <br> **spec** <br> `` hostNetwork:  `` 
+
+
 ### Example of healthy podspec
 - For testing replace the image with any image you want to test the POD deployment against
 - The example assumes keyVault integration with secrets store driver. If you don't have such integration configured, remove ``volumes`` and ``volumeMounts``  
@@ -48,8 +73,8 @@ metadata:
 spec:
   automountServiceAccountToken: false
   containers:
-    - name: v5
-      image: acraksa.azurecr.io/v5rce:latest
+    - name: nginxHealthy
+      image: nginx:1.14.2
       ports:
         - containerPort: 8443
       resources:
@@ -129,6 +154,18 @@ with:
 ![img](img/secret.png)
 
 6. From actions start the workflow manually
+
+![img](img/wf.png)
+
+7. After update you should see the following output in actions and at azure policy
+
+![img](img/assign.png)
+
+![img](img/deployed.png)
+
+8.  Assign the policy to test cluster
+
+![img](img/assingment.png)
 
 ### Advanced with Workload federation (recommended for enterprise use)
 
