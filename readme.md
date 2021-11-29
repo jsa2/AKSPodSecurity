@@ -18,6 +18,7 @@ Description| source
 
 - [Azure Kubernetes Service - Enhanced Kubernetes cluster pod security baseline standards for Linux-based workloads](#azure-kubernetes-service---enhanced-kubernetes-cluster-pod-security-baseline-standards-for-linux-based-workloads)
   - [Differences compared to the built-in initiative:](#differences-compared-to-the-built-in-initiative)
+  - [Disclaimer](#disclaimer)
   - [Utilizing the initiative](#utilizing-the-initiative)
     - [Example of which policy affects which specification in resource](#example-of-which-policy-affects-which-specification-in-resource)
     - [Example of healthy podspec](#example-of-healthy-podspec)
@@ -55,7 +56,8 @@ kubectl debug node/$val -it --image=mcr.microsoft.com/aks/fundamental/base-ubunt
 ![img](img/init.png)
 
 ---
-
+## Disclaimer
+[Read license](LICENSE)
 ## Utilizing the initiative 
 
 - Target the Policy to scope you want to apply it (Recommendation for testing is to target it to single AKS cluster)
